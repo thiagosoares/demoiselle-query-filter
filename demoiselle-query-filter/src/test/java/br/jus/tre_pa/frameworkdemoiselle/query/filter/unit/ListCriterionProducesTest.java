@@ -7,11 +7,10 @@ import javax.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import br.gov.frameworkdemoiselle.junit.DemoiselleRunner;
 import br.jus.tre_pa.frameworkdemoiselle.query.filter.fixture.ListCriterionFixture;
 import br.jus.tre_pa.frameworkdemoiselle.query.filter.operations.InOperation;
 
-@RunWith(DemoiselleRunner.class)
+//@RunWith(DemoiselleRunner.class)
 public class ListCriterionProducesTest {
 
 	@Inject

@@ -1,9 +1,11 @@
 package br.jus.tre_pa.frameworkdemoiselle.query.filter.core;
 
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import javax.enterprise.context.ContextNotActiveException;
+import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -18,27 +20,41 @@ import br.gov.frameworkdemoiselle.util.Beans;
 import br.gov.frameworkdemoiselle.util.Reflections;
 import br.jus.tre_pa.frameworkdemoiselle.query.filter.helper.JPAQueryHelper;
 
-public class JPAQueryFilter<T> implements Serializable {
+public class JPAQueryFilter<T extends Object> implements QueryFilter<T>, Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 4307459614522545738L;
 
-	private EntityManager entityManager;
+  private EntityManager entityManager;
 
 	private Pagination pagination;
 
 	private Class<T> beanClass;
-
+	
 	@Inject
 	private JPAQueryHelper helper;
+	
+	@Inject
+	private InjectionPoint injectionPoint;
+	
+	
+	/*public JPAQueryFilter() {
+    super();
+    this.beanClass = (Class<T>) Clazz.typeForGenericSuperclass(getClass(), 0);
+  }*/
 
-	public JPAQueryFilter() {
-		super();
-	}
+	/*public JPAQueryFilter(EntityManager entityManager, Class<T> beanClass) {
+    super();
+    
+    this.entityManager = entityManager;
+    this.beanClass = beanClass;
+  }*/
 
-	public List<T> findAll() {
+  /*public static <T> JPAQueryFilter<T> create(EntityManager entityManager, Class<T> beanClass) {
+	  return new JPAQueryFilter<T>(entityManager, beanClass);
+	}*/
+	
+
+  public List<T> findAll() {
 		CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
 		CriteriaQuery<T> cq = cb.createQuery(getBeanClass());
 		Root<T> p = cq.from(getBeanClass());
@@ -83,15 +99,22 @@ public class JPAQueryFilter<T> implements Serializable {
 	}
 
 	protected Class<T> getBeanClass() {
-		if (this.beanClass == null) {
-			this.beanClass = Reflections.getGenericTypeArgument(this.getClass(), 0);
+	  
+	  if (this.beanClass == null) {
+	    ParameterizedType type = (ParameterizedType) injectionPoint.getType();
+    
+	  
+	    this.beanClass = (Class<T>) type.getActualTypeArguments()[0];
+		  //TODO Isso não esta funcionando. Ver o motivo
+			//this.beanClass = Reflections.getGenericTypeArgument(this.getClass(), 0);
 		}
 
 		return this.beanClass;
 	}
-
+	
 	protected EntityManager getEntityManager() {
 		if (this.entityManager == null) {
+		  //TODO Acredito que isso possa trazer problemas. E quando houver mais que um ?
 			this.entityManager = Beans.getReference(EntityManager.class);
 		}
 
@@ -112,4 +135,11 @@ public class JPAQueryFilter<T> implements Serializable {
 		return pagination;
 	}
 
+
+  public void setBeanClass(Class<T> beanClass) {
+    this.beanClass = beanClass;
+  }
+
+	
+	
 }
