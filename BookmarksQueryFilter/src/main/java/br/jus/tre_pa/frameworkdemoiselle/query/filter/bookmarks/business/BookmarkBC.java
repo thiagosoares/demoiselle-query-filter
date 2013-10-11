@@ -47,6 +47,8 @@ public class BookmarkBC extends DelegateCrud<Bookmark, Long, BookmarkDAO> {
 	  //Insirar as regras de negócio aki
 	  //Valide a pesquisa aki.
 	  
+	  
+	  //TODO O para BookmarkQueryFilter deve ser passado para a busca
 	  return qfilter.findAll();
 	}
 	
